@@ -1,0 +1,13 @@
+#!/bin/bash
+
+serve() {
+  .venv/bin/python -m stapler serve
+}
+
+build() {
+  .venv/bin/python -m stapler build
+}
+
+format() {
+  ruff format .
+}
