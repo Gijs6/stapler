@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>blog</h1>
+{% for post in posts %}
+    <article>
+        <h2><a href="/blog/{{ post.slug }}">{{ post.title }}</a></h2>
+        <time datetime="{{ post.date_iso }}">{{ post.date }}</time>
+    </article>
+{% endfor %}
+{% endblock %}
