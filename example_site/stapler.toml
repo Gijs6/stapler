@@ -1,0 +1,11 @@
+[site]
+url = "https://example.com"
+title = "Stapler Example"
+description = "Example site built with Stapler"
+
+[site.author]
+name = "Example Author"
+email = "author@example.com"
+
+[features.blog]
+enabled = true
