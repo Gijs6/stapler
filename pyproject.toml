@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "Unlicense"}
 authors = [
-    {name = "Gijs6", email = "gijs6@dupunkto.org"},
+    {name = "Gijs6", email = "me@gijs6.nl"},
 ]
 
 dependencies = [
