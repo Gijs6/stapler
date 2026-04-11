@@ -33,10 +33,7 @@ class BuildHandler(FileSystemEventHandler):
 
         rel_path = os.path.relpath(event.src_path)
         timestamp = datetime.now(timezone.utc).strftime("%H:%M:%S")
-        print(
-            f"\n{Fore.BLUE}[{timestamp}]{Style.RESET_ALL} "
-            f"{Fore.YELLOW}File changed:{Style.RESET_ALL} {rel_path}\n"
-        )
+        print(f"\n{Fore.BLUE}[{timestamp}]{Style.RESET_ALL} {Fore.YELLOW}File changed:{Style.RESET_ALL} {rel_path}\n")
         self.build_func()
 
 
@@ -76,12 +73,7 @@ class StaplerHTTPServer(SimpleHTTPRequestHandler):
             status_color = Fore.RED
 
         timestamp = datetime.now(timezone.utc).strftime("%H:%M:%S")
-        print(
-            f"{Fore.BLUE}[{timestamp}]{Style.RESET_ALL}  "
-            f"{method_color}{Style.BRIGHT}{method}{Style.RESET_ALL}  "
-            f"{Fore.WHITE}{path}{Style.RESET_ALL}  "
-            f"{status_color}{status}{Style.RESET_ALL}"
-        )
+        print(f"{Fore.BLUE}[{timestamp}]{Style.RESET_ALL}  {method_color}{Style.BRIGHT}{method}{Style.RESET_ALL}  {Fore.WHITE}{path}{Style.RESET_ALL}  {status_color}{status}{Style.RESET_ALL}")
 
     def do_GET(self):
         path = self.translate_path(self.path)
@@ -89,11 +81,7 @@ class StaplerHTTPServer(SimpleHTTPRequestHandler):
         if self.path.endswith("/") or self.path == "":
             index_path = os.path.join(path, "index.html")
             if os.path.isfile(index_path):
-                self.path = (
-                    self.path.rstrip("/") + "/index.html"
-                    if not self.path.endswith("index.html")
-                    else self.path
-                )
+                self.path = self.path.rstrip("/") + "/index.html" if not self.path.endswith("index.html") else self.path
                 return super().do_GET()
 
         if os.path.isfile(path):
@@ -138,10 +126,7 @@ def serve(config, port=8000):
 
     print(f"{Fore.GREEN}Server running at {Style.BRIGHT}http://localhost:{port}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}Serving from: {Style.BRIGHT}{build_dev_dir}/{Style.RESET_ALL}")
-    print(
-        f"{Fore.MAGENTA}Watching: {Style.BRIGHT}{cfg.get_site_dir(config)}/ "
-        f"{Style.RESET_ALL}and config file"
-    )
+    print(f"{Fore.MAGENTA}Watching: {Style.BRIGHT}{cfg.get_site_dir(config)}/ {Style.RESET_ALL}and config file")
     print(f"\n{Fore.YELLOW}Press Ctrl+C to stop{Style.RESET_ALL}\n")
 
     try:

@@ -115,9 +115,7 @@ def _generate_blog_index(config, template_env, data, blog_dir, blog_section, pos
 def _generate_post_pages(config, template_env, data, blog_dir, blog_section, posts):
     base_path = cfg.get_base_path(config)
     for post in posts:
-        canonical_path = (
-            f"{base_path}/{blog_section}/{post['slug']}" if base_path else f"/{blog_section}/{post['slug']}"
-        )
+        canonical_path = f"{base_path}/{blog_section}/{post['slug']}" if base_path else f"/{blog_section}/{post['slug']}"
 
         post_path = os.path.join(blog_dir, f"{post['slug']}.html")
         with open(post_path, "w", encoding="utf-8") as f:
