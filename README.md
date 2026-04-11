@@ -1,199 +1,188 @@
-# stapler
+# Stapler
 
-a simple static site generator built with jinja2 and markdown. no fancy theme systems, just clean python code that turns your templates and content into a website.
+A simple static site generator built with Jinja and Markdown.
 
-## installation
+## Installation
 
-clone the repo:
+Clone the repo:
 
 ```bash
 git clone https://github.com/gijs6/stapler.git
 cd stapler
 ```
 
-create a virtual environment (recommended):
+Create a virtual environment (recommended):
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # on windows: .venv\Scripts\activate
+source .venv/bin/activate
 ```
 
-install:
+Install:
 
 ```bash
 pip install -e .
 ```
 
-or with dev dependencies:
+Or with dev dependencies:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-## quick start
+## Quick start
 
-create a folder with `stapler.toml`:
+Create a folder with `stapler.toml`:
 
 ```toml
 [site]
 url = "https://yoursite.com"
-title = "your site"
+title = "Your site"
 ```
 
-those two fields are required. everything else is optional.
+Those two fields are required, everything else is optional.
 
-create a `site/` folder (or whatever you want to call it). put your content there. run:
+Stapler by default assumes your content is in the `site/` directory.
 
 ```bash
 stapler serve
+stapler build
 ```
 
-that's it.
+## Configuration
 
-## configuration
-
-### required
+### Required
 
 ```toml
 [site]
 url = "https://yoursite.com"
-title = "your site"
+title = "Your site"
 ```
 
-### optional stuff
+### Optional
 
-**site metadata:**
+#### Site metadata
 
 ```toml
 [site]
-description = "about your site"
-base_path = "/blog"                # if deploying to example.com/blog instead of root
-                                   # leave empty for root deployment
+description = "About your site"
+base_path = "/blog"                # For deploying to example.com/blog instead of the root
 ```
 
-**author info** (used in rss/atom feeds):
+#### Author info (used in rss/atom feeds)
 
 ```toml
 [site.author]
-name = "your name"
+name = "Your name"
 email = "you@example.com"
 ```
 
-**directories** (all paths relative to where you run stapler):
+#### Directories (all paths relative to where you run stapler)
 
 ```toml
 [directories]
-site = "site"                      # where your content lives (default: "site")
-build = "build"                    # production output (default: "build")
-build_dev = "build-dev"            # dev server output (default: "build-dev")
-templates = "templates"            # templates folder inside site/ (default: "templates")
-blog = "blog"                      # blog posts folder inside site/ (default: "blog")
+site = "site"                      # Where your content is (default: "site")
+build = "build"                    # Production output (default: "build")
+build_dev = "build-dev"            # Dev server output (default: "build-dev")
+templates = "templates"            # Templates directory inside site directory (default: "templates")
+blog = "blog"                      # Blog posts directory inside site directory (default: "blog")
 ```
 
-**templates:**
+#### Templates
 
 ```toml
 [templates]
-default = "base.html"              # template used when page has no front matter
+default = "base.html"              # Template used when page has no front matter
 ```
 
-**blog feature:**
+#### Blog
 
 ```toml
 [features.blog]
-enabled = true                     # turn on blog functionality (default: false)
-template = "blog_post.html"        # template for individual posts
-index_template = "blog_index.html" # template for /blog/ index page
+enabled = true                     # Turn on blog functionality (default: false)
+template = "blog_post.html"        # Template for individual posts
+index_template = "blog_index.html" # Template for /blog/ index page
 ```
 
-**other features:**
+#### Other features
 
 ```toml
 [features]
-sitemap = true                     # generate sitemap.xml (default: true)
-feeds = true                       # generate both rss.xml and atom.xml (default: true)
-                                   # only works if blog is enabled
+sitemap = true                     # Generate sitemap.xml (default: true)
+feeds = true                       # Generate both rss.xml and atom.xml (only works if blog is enabled) (default: true)
 
-# or choose specific formats:
 [features.feeds]
-rss = true                         # generate rss.xml (default: true)
-atom = true                        # generate atom.xml (default: true)
+rss = true                         # Generate rss.xml (default: true)
+atom = true                        # Generate atom.xml (default: true)
 ```
 
-**markdown processing:**
+#### Markdown processing
 
 ```toml
 [markdown]
-extensions = ["meta", "tables", "fenced_code"]  # python-markdown extensions
-                                                # meta = yaml front matter support
-                                                # tables = markdown tables
-                                                # fenced_code = ``` code blocks
+extensions = ["meta", "tables", "fenced_code"]  # Python-markdown extensions
 ```
 
-## how it works
+## How it works
 
-### pages
+### Pages
 
-any `.html` or `.md` file in your site folder becomes a page.
+Any `.html` or `.md` file in your site directory becomes a page.
 
-**with front matter:**
+**With front matter:**
 
 ```html
 ---
-template: whatever.html
-title: my page
-custom_field: whatever you want
+template: template.html
+title: My page
+custom_field: anything
 ---
-<h1>content here</h1>
+<h1>Content here</h1>
 ```
 
-front matter is yaml. you can put whatever fields you want in there. they'll be available as `page.field_name` in your templates.
+```markdown
+---
+title: My page
+---
 
-**without front matter:**
+# Content
 
-treated as a jinja2 template. you can use template inheritance, variables, whatever.
+Regular markdown here
+```
+
+The front matter is in YAML. All fields are avaiable as as `page.field_name` in your templates.
+
+**Without front matter:**
+
+Without front matter, the pages are treated as Jinja templates.
 
 ```html
 {% extends "base.html" %}
 {% block content %}
-<h1>hello</h1>
+<h1>Hello</h1>
 {% endblock %}
 ```
 
-### markdown
+### Blog
 
-works the same as html pages:
-
-```markdown
----
-title: my page
----
-
-# content
-
-regular markdown here
-```
-
-### blog
-
-if you enable the blog feature, put `.md` files in your blog folder.
+If you enable the blog feature, put `.md` files in your blog directory.
 
 ```markdown
 ---
-title: my post
+title: My post
 date: 2025-01-15
 ---
 
-post content
+Post content
 ```
 
-date is optional - if you don't provide it, stapler tries to get it from git history.
+The date is optional. If you don't provide it, stapler will try to get it from git history.
 
-### templates
+### Templates
 
-put templates wherever you configured (default: `site/templates/`).
+Put templates in the directory you configured (default: `site/templates/`).
 
-templates get these variables:
+Templates get these variables:
 
 - `data` - build info (current time, git commit, etc)
 - `page` - page metadata and content (if page has front matter)
@@ -202,45 +191,14 @@ templates get these variables:
 - `active_page` - for nav highlighting
 - `canonical_path` - url path
 
-structure them however you want. use template inheritance, partials, whatever jinja2 supports.
+### Static files
 
-### static files
+Anything that's not in your templates or blog folder gets copied as-is.
 
-anything that's not in your templates or blog folder gets copied as-is. put your css, images, whatever wherever you want.
-
-## cli
-
-### commands
-
-**build** - build your site for production
+## CLI
 
 ```bash
-stapler build
-```
-
-options:
-
-- `-c, --config FILE` - path to config file (default: stapler.toml)
-
-**serve** - start dev server with live reload
-
-```bash
-stapler serve
-```
-
-options:
-
-- `-c, --config FILE` - path to config file (default: stapler.toml)
-- `-p, --port PORT` - port to serve on (default: 8000)
-
-**general options**
-
-- `--version` - show version and exit
-
-### examples
-
-```bash
-# build with default config
+# build with default config (stapler.toml)
 stapler build
 
 # build with custom config
@@ -258,32 +216,3 @@ stapler serve -c myconfig.toml -p 3000
 # show version
 stapler --version
 ```
-
-## examples
-
-a minimal site:
-
-```
-my-site/
-├── stapler.toml
-└── site/
-    └── index.html
-```
-
-a blog:
-
-```
-my-site/
-├── stapler.toml
-└── site/
-    ├── templates/
-    │   ├── base.html
-    │   ├── blog_post.html
-    │   └── blog_index.html
-    ├── blog/
-    │   ├── first-post.md
-    │   └── second-post.md
-    └── index.html
-```
-
-organize it however makes sense to you.
