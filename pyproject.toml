@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "stapler-ssg"
 version = "0.1.0"
-description = "simple static site generator"
+description = "Simple Jinja-based static site generator"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "Unlicense"}
