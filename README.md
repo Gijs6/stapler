@@ -199,22 +199,22 @@ Templates live in the directory you configured (default: `site/templates/`).
 #### Available in all templates
 
 - `data`: build info
-  - `data.now`
-    - `data.now.date.long`: build date as `%B %d, %Y` (e.g. `April 12, 2026`)
-    - `data.now.date.short`: build date as `%Y-%m-%d` (e.g. `2026-04-12`)
-    - `data.now.time`: build time as `%H:%M:%S`
-    - `data.now.iso`: build datetime as ISO 8601
+  - `data.now`: current build time
+    - `data.now.date.long`: date as `%B %d, %Y` (e.g. `April 12, 2026`)
+    - `data.now.date.short`: date as `%Y-%m-%d` (e.g. `2026-04-12`)
+    - `data.now.time`: time as `%H:%M:%S`
+    - `data.now.iso`: datetime as ISO 8601
   - `data.last_commit`: last git commit info (`None` if not in a git repo)
     - `data.last_commit.hash.short`: short 7-character commit hash
     - `data.last_commit.hash.long`: full commit hash
-    - `data.last_commit.dt.date.long`: commit date as `%B %d, %Y` (e.g. `April 12, 2026`)
-    - `data.last_commit.dt.date.short`: commit date as `%Y-%m-%d` (e.g. `2026-04-12`)
-    - `data.last_commit.dt.time`: commit time as `%H:%M:%S`
-    - `data.last_commit.dt.iso`: commit datetime as ISO 8601
+    - `data.last_commit.dt.date.long`: date as `%B %d, %Y` (e.g. `April 12, 2026`)
+    - `data.last_commit.dt.date.short`: date as `%Y-%m-%d` (e.g. `2026-04-12`)
+    - `data.last_commit.dt.time`: time as `%H:%M:%S`
+    - `data.last_commit.dt.iso`: datetime as ISO 8601
 
 #### Regular page templates
 
-- `page`
+- `page`: the current page
   - `page.active_page`: identifier derived from the filename (e.g. `about` for `about.html`, `home` for `index.html`), useful for highlighting the active nav item
   - `page.canonical_path`: URL path of the page (e.g. `/about`)
   - `page.content`: page content as HTML (only present if the page has front matter)
@@ -222,21 +222,23 @@ Templates live in the directory you configured (default: `site/templates/`).
 
 #### Blog post template
 
+- `page`: navigation info
+  - `page.active_page`: name of the blog directory (e.g. `blog`)
+  - `page.canonical_path`: URL path of the post (e.g. `/blog/my-post`)
 - `post`: the current blog post
   - `post.title`: post title (from front matter, or derived from the filename)
   - `post.slug`: URL slug (filename without `.md`)
-  - `post.content`: post body as HTML
+  - `post.content`: post content as HTML
   - `post.date`: date as `%Y-%m-%d` (e.g. `2026-04-12`), only set if a date is available
   - `post.date_iso`: date as ISO 8601, only set if a date is available
-- `active_page`: name of the blog directory (e.g. `blog`)
-- `canonical_path`: URL path of the post (e.g. `/blog/my-post`)
 - `data`: same as above
 
 #### Blog index template
 
+- `page`: navigation info
+  - `page.active_page`: name of the blog directory (e.g. `blog`)
+  - `page.canonical_path`: URL path of the blog index (e.g. `/blog`)
 - `posts`: list of all blog posts sorted newest first; each item has the same fields as `post` above
-- `active_page`: name of the blog directory (e.g. `blog`)
-- `canonical_path`: URL path of the blog index (e.g. `/blog`)
 - `data`: same as above
 
 ## CLI

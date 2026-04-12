@@ -105,8 +105,7 @@ def _generate_blog_index(config, template_env, data, blog_dir, blog_section, pos
         f.write(
             template_env.get_template(cfg.get_blog_index_template(config)).render(
                 posts=posts,
-                active_page=blog_section,
-                canonical_path=canonical_path,
+                page={"active_page": blog_section, "canonical_path": canonical_path},
                 data=data,
             )
         )
@@ -122,8 +121,7 @@ def _generate_post_pages(config, template_env, data, blog_dir, blog_section, pos
             f.write(
                 template_env.get_template(cfg.get_blog_template(config)).render(
                     post=post,
-                    active_page=blog_section,
-                    canonical_path=canonical_path,
+                    page={"active_page": blog_section, "canonical_path": canonical_path},
                     data=data,
                 )
             )
