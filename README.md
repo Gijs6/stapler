@@ -32,7 +32,7 @@ pip install -e ".[dev]"
 
 ## Quick start
 
-Create a folder with `stapler.toml`:
+1. Create a `stapler.toml` in your project root:
 
 ```toml
 [site]
@@ -40,13 +40,13 @@ url = "https://yoursite.com"
 title = "Your site"
 ```
 
-Those two fields are required, everything else is optional.
+2. Put your content in a `site/` directory (the default). Templates go in `site/templates/`.
 
-Stapler by default assumes your content is in the `site/` directory.
+3. Run:
 
 ```bash
-stapler serve
-stapler build
+stapler serve   # local dev server on port 8000
+stapler build   # production build
 ```
 
 ## Configuration
@@ -66,10 +66,12 @@ title = "Your site"
 ```toml
 [site]
 description = "About your site"
-base_path = "/blog"                # For deploying to example.com/blog instead of the root
+base_path = "/blog"                # Deploy to example.com/blog instead of the root
 ```
 
-#### Author info (used in rss/atom feeds)
+#### Author info
+
+Used in RSS/Atom feeds.
 
 ```toml
 [site.author]
@@ -77,71 +79,70 @@ name = "Your name"
 email = "you@example.com"
 ```
 
-#### Directories (all paths relative to where you run stapler)
+#### Directories
+
+All paths are relative to where you run `stapler`.
 
 ```toml
 [directories]
-site = "site"                      # Where your content is (default: "site")
+site = "site"                      # Content directory (default: "site")
 build = "build"                    # Production output (default: "build")
 build_dev = "build-dev"            # Dev server output (default: "build-dev")
-templates = "templates"            # Templates directory inside site directory (default: "templates")
-blog = "blog"                      # Blog posts directory inside site directory (default: "blog")
+templates = "templates"            # Templates folder inside the site directory (default: "templates")
+blog = "blog"                      # Blog posts folder inside the site directory (default: "blog")
 ```
 
-#### Templates
+#### Default template
+
+The template used for HTML pages that have front matter but no `template` field.
 
 ```toml
 [templates]
-default = "base.html"              # Template used when page has no front matter
+default = "base.html"
 ```
 
 #### Blog
 
 ```toml
 [features.blog]
-enabled = true                     # Turn on blog functionality (default: false)
+enabled = true                     # Enable blog functionality (default: false)
 template = "blog_post.html"        # Template for individual posts
-index_template = "blog_index.html" # Template for /blog/ index page
+index_template = "blog_index.html" # Template for the blog index page
 ```
 
-#### Other features
+#### Sitemap and feeds
 
 ```toml
 [features]
 sitemap = true                     # Generate sitemap.xml (default: true)
-feeds = true                       # Generate both rss.xml and atom.xml (only works if blog is enabled) (default: true)
 
 [features.feeds]
 rss = true                         # Generate rss.xml (default: true)
 atom = true                        # Generate atom.xml (default: true)
 ```
 
-#### Markdown processing
+Feeds are only generated when the blog feature is enabled.
+
+#### Markdown extensions
 
 ```toml
 [markdown]
-extensions = ["meta", "tables", "fenced_code"]  # Python-markdown extensions
+extensions = ["meta", "tables", "fenced_code"]  # Python-Markdown extensions
 ```
 
 ## How it works
 
 ### Pages
 
-Any `.html` or `.md` file in your site directory becomes a page.
+Any `.html` or `.md` file in your site directory (excluding the templates and blog folders) becomes a page.
 
-**With front matter:**
+#### Markdown files
 
-```html
----
-template: template.html
-title: My page
-custom_field: anything
----
-<h1>Content here</h1>
-```
+Markdown files are always rendered to HTML. If the front matter includes a `template` field, the result is passed to that template as `page.content`. Without a `template` field (or without front matter entirely), the raw HTML is written directly.
 
 ```markdown
 ---
+template: base.html
 title: My page
 ---
 
@@ -150,11 +151,18 @@ title: My page
 Regular markdown here
 ```
 
-The front matter is in YAML. All fields are avaiable as as `page.field_name` in your templates.
+#### HTML files
 
-**Without front matter:**
+HTML files with front matter are rendered through a template. The `template` field in front matter takes precedence; if omitted, the default template from `[templates].default` is used.
 
-Without front matter, the pages are treated as Jinja templates.
+```html
+---
+title: My page
+---
+<h1>Content here</h1>
+```
+
+HTML files without front matter are treated as Jinja templates directly:
 
 ```html
 {% extends "base.html" %}
@@ -163,9 +171,15 @@ Without front matter, the pages are treated as Jinja templates.
 {% endblock %}
 ```
 
+Front matter is YAML. All fields are available as `page.metadata.<field>` in your templates.
+
+#### Static files
+
+Anything that's not a `.html` or `.md` file (and not in your templates or blog folder) is copied as-is to the output directory.
+
 ### Blog
 
-If you enable the blog feature, put `.md` files in your blog directory.
+Enable the blog feature in your config, then put `.md` files in your blog directory.
 
 ```markdown
 ---
@@ -173,46 +187,76 @@ title: My post
 date: 2025-01-15
 ---
 
-Post content
+Post content here
 ```
 
-The date is optional. If you don't provide it, stapler will try to get it from git history.
+The `date` field is optional. If omitted, stapler tries to infer it from the file's git history.
 
 ### Templates
 
-Put templates in the directory you configured (default: `site/templates/`).
+Templates live in the directory you configured (default: `site/templates/`).
 
-Templates get these variables:
+#### Available in all templates
 
-- `data` - build info (current time, git commit, etc)
-- `page` - page metadata and content (if page has front matter)
-- `post` - blog post object (if it's a blog post)
-- `posts` - all blog posts (sorted newest first)
-- `active_page` - for nav highlighting
-- `canonical_path` - url path
+- `data`: build info
+  - `data.now`
+    - `data.now.date.long`: build date as `%B %d, %Y` (e.g. `April 12, 2026`)
+    - `data.now.date.short`: build date as `%Y-%m-%d` (e.g. `2026-04-12`)
+    - `data.now.time`: build time as `%H:%M:%S`
+    - `data.now.iso`: build datetime as ISO 8601
+  - `data.last_commit`: last git commit info (`None` if not in a git repo)
+    - `data.last_commit.hash.short`: short 7-character commit hash
+    - `data.last_commit.hash.long`: full commit hash
+    - `data.last_commit.dt.date.long`: commit date as `%B %d, %Y` (e.g. `April 12, 2026`)
+    - `data.last_commit.dt.date.short`: commit date as `%Y-%m-%d` (e.g. `2026-04-12`)
+    - `data.last_commit.dt.time`: commit time as `%H:%M:%S`
+    - `data.last_commit.dt.iso`: commit datetime as ISO 8601
 
-### Static files
+#### Regular page templates
 
-Anything that's not in your templates or blog folder gets copied as-is.
+- `page`
+  - `page.active_page`: identifier derived from the filename (e.g. `about` for `about.html`, `home` for `index.html`), useful for highlighting the active nav item
+  - `page.canonical_path`: URL path of the page (e.g. `/about`)
+  - `page.content`: page content as HTML (only present if the page has front matter)
+  - `page.metadata.<field>`: any front matter field (e.g. `page.metadata.title`)
+
+#### Blog post template
+
+- `post`: the current blog post
+  - `post.title`: post title (from front matter, or derived from the filename)
+  - `post.slug`: URL slug (filename without `.md`)
+  - `post.content`: post body as HTML
+  - `post.date`: date as `%Y-%m-%d` (e.g. `2026-04-12`), only set if a date is available
+  - `post.date_iso`: date as ISO 8601, only set if a date is available
+- `active_page`: name of the blog directory (e.g. `blog`)
+- `canonical_path`: URL path of the post (e.g. `/blog/my-post`)
+- `data`: same as above
+
+#### Blog index template
+
+- `posts`: list of all blog posts sorted newest first; each item has the same fields as `post` above
+- `active_page`: name of the blog directory (e.g. `blog`)
+- `canonical_path`: URL path of the blog index (e.g. `/blog`)
+- `data`: same as above
 
 ## CLI
 
 ```bash
-# build with default config (stapler.toml)
+# Build with default config (stapler.toml)
 stapler build
 
-# build with custom config
+# Build with custom config
 stapler build -c myconfig.toml
 
-# serve on default port (8000)
+# Serve on default port (8000)
 stapler serve
 
-# serve on custom port
+# Serve on custom port
 stapler serve -p 3000
 
-# serve with custom config and port
+# Serve with custom config and port
 stapler serve -c myconfig.toml -p 3000
 
-# show version
+# Show version
 stapler --version
 ```

@@ -126,7 +126,7 @@ def _process_markdown_file(config, template_env, md_processor, data, filepath, o
         active_page, canonical_path = infer_page_metadata(rel_path, cfg.get_base_path(config))
 
         page_data = {"content": html_content}
-        page_data.update(metadata)
+        page_data["metadata"] = metadata
         if "active_page" not in page_data:
             page_data["active_page"] = active_page
         if "canonical_path" not in page_data:
@@ -153,7 +153,7 @@ def _process_html_file(config, template_env, data, filepath, output_path, rel_pa
             active_page, canonical_path = infer_page_metadata(rel_path, cfg.get_base_path(config))
 
             page_data = {"content": html_content}
-            page_data.update(metadata)
+            page_data["metadata"] = metadata
             if "active_page" not in page_data:
                 page_data["active_page"] = active_page
             if "canonical_path" not in page_data:
@@ -167,10 +167,13 @@ def _process_html_file(config, template_env, data, filepath, output_path, rel_pa
     else:
         try:
             active_page, canonical_path = infer_page_metadata(rel_path, cfg.get_base_path(config))
+            page_data = {
+                "active_page": active_page,
+                "canonical_path": canonical_path
+            }
             template = template_env.from_string(content)
             rendered = template.render(
-                active_page=active_page,
-                canonical_path=canonical_path,
+                page=page_data,
                 data=data,
             )
         except Exception as e:
