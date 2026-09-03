@@ -167,10 +167,7 @@ def _process_html_file(config, template_env, data, filepath, output_path, rel_pa
     else:
         try:
             active_page, canonical_path = infer_page_metadata(rel_path, cfg.get_base_path(config))
-            page_data = {
-                "active_page": active_page,
-                "canonical_path": canonical_path
-            }
+            page_data = {"active_page": active_page, "canonical_path": canonical_path}
             template = template_env.from_string(content)
             rendered = template.render(
                 page=page_data,
