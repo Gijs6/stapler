@@ -121,7 +121,16 @@ def serve(config, port=8000):
     class DevHTTPServer(StaplerHTTPServer):
         directory = build_dev_dir
 
-    server = HTTPServer(("localhost", port), DevHTTPServer)
+    for candidate in range(port, port + 100):
+        try:
+            server = HTTPServer(("0.0.0.0", candidate), DevHTTPServer)
+            port = candidate
+            break
+        except OSError as exc:
+            if exc.errno != 98:
+                raise
+    else:
+        raise SystemExit(f"stapler: no free port in {port}-{port + 99}")
     threading.Thread(target=server.serve_forever, daemon=True).start()
 
     print(f"{Fore.GREEN}Server running at {Style.BRIGHT}http://localhost:{port}{Style.RESET_ALL}")
