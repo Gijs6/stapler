@@ -18,8 +18,13 @@ class BuildHandler(FileSystemEventHandler):
         self.build_func = build_func
         self.last_build = 0
 
-    def on_modified(self, event):
-        if event.is_directory or "build" in event.src_path:
+    def on_any_event(self, event):
+        if event.event_type not in ("modified", "created", "moved"):
+            return
+
+        src_path = getattr(event, "dest_path", None) or event.src_path
+
+        if event.is_directory or "build" in src_path:
             return
 
         now = time.time()
@@ -27,11 +32,11 @@ class BuildHandler(FileSystemEventHandler):
             return
         self.last_build = now
 
-        if os.path.basename(event.src_path) in ["stapler.toml", "stapler.yaml", "stapler.yml"]:
+        if os.path.basename(src_path) in ["stapler.toml", "stapler.yaml", "stapler.yml"]:
             print(f"\n{Fore.YELLOW}Config changed! Restarting...{Style.RESET_ALL}\n")
             os.execv(sys.executable, [sys.executable] + sys.argv)
 
-        rel_path = os.path.relpath(event.src_path)
+        rel_path = os.path.relpath(src_path)
         timestamp = datetime.now(timezone.utc).strftime("%H:%M:%S")
         print(f"\n{Fore.BLUE}[{timestamp}]{Style.RESET_ALL} {Fore.YELLOW}File changed:{Style.RESET_ALL} {rel_path}\n")
         self.build_func()
